@@ -77,6 +77,12 @@
 
 \providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 
+% Pandoc emits these when a fenced block carries a language tag. Without them
+% such a block fails to compile.
+$if(highlighting-macros)$
+$highlighting-macros$
+$endif$
+
 $if(title)$
 \title{\textbf{$title$}}
 $endif$

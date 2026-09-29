@@ -78,7 +78,7 @@ interaction points: scope, and audience/purpose per section.
 Run the splitter to get the section and paragraph inventory:
 
 ```bash
-python3 scripts/split_paragraphs.py <path> --summary
+python3 ~/.claude/skills/writing-simple-style/scripts/split_paragraphs.py <path> --summary
 ```
 
 For a LaTeX root file that pulls in section files, add `--follow-inputs`.
@@ -117,7 +117,7 @@ plainly share a reader.
 ### 0.4 Extract the paragraphs
 
 ```bash
-python3 scripts/split_paragraphs.py <path> --section "<title>" --json /tmp/paras.json
+python3 ~/.claude/skills/writing-simple-style/scripts/split_paragraphs.py <path> --section "<title>" --json /tmp/paras.json
 ```
 
 Read the JSON. Each paragraph carries `id`, `file`, `start_line`, `end_line`, `n_words`,
@@ -146,8 +146,19 @@ Use **one** `AskUserQuestion` call containing both questions (and genre as a thi
 genuinely unclear). Each question offers exactly three options. The tool adds "Other"
 automatically, so the user can always override.
 
-Write the options as concrete reader descriptions, not labels. Bad: "Experts". Good:
-"Reviewers in your subfield who know the notation and want to check correctness".
+Split each option across the tool's two fields. `label` takes a short noun phrase of one
+to five words, or it will be truncated in the UI. `description` takes the concrete reader
+picture and what choosing it implies. So not `label: "Researchers in the wider field who
+know the area but not the notation"`, but:
+
+```
+label:       "Wider field"
+description: "Researchers in adjacent areas who know the problem but not your
+              notation. Subfield terms will need a one-clause definition at first use."
+```
+
+The tables below give the option *content*; the bold phrase is the `label` and the rest
+belongs in `description`.
 
 Three audience options, calibrated to the section you just read:
 
@@ -192,9 +203,9 @@ Work through the section once at section level (group A), then paragraph by para
 
 Load the two reference files before judging anything:
 
-- `references/elements-of-style.md` — Strunk's rule text, examples, and the academic
+- `~/.claude/skills/writing-simple-style/references/elements-of-style.md` — Strunk's rule text, examples, and the academic
   adaptations that override him
-- `references/iso-24495-plain-language.md` — paraphrased ISO guidance with clause numbers
+- `~/.claude/skills/writing-simple-style/references/iso-24495-plain-language.md` — paraphrased ISO guidance with clause numbers
 
 For every finding produce: anchor, quoted span, one-line reason citing the rule, and a
 **rewrite**. See the finding format in `templates/output_template.md`.
@@ -396,7 +407,7 @@ count delta.**
   "Six padded constructions, 47 words removable (312 → 265)" is more useful than six bullets.
 
 #### L4. Words and expressions commonly misused
-*Strunk Chapter V.* Use the filtered table in `references/elements-of-style.md`. That table
+*Strunk Chapter V.* Use the filtered table in `~/.claude/skills/writing-simple-style/references/elements-of-style.md`. That table
 carries the severity for each entry and lists the entries this skill deliberately drops.
 - Respect the exceptions recorded there: do **not** flag sentence-initial "However,";
   do **not** flag `feature` in its machine-learning sense or `state` as a system-state noun;
@@ -475,11 +486,17 @@ Requirements:
 - The overall assessment says what the writing does **well**, not only what is wrong.
 - Close with the "Not assessed" section from the template, including the ISO 24495-1 §5.4.3
   point that an automated review does not replace testing with real readers.
+- **Never put a language tag on a fenced code block** in the report. A tagged fence makes
+  pandoc emit syntax-highlighting macros that the report template does not define, and the
+  PDF build fails. Plain ``` fences are safe.
+- Quote the author's text inside backticks, never as a `>` blockquote inside a list item.
+  Markdown does not nest a blockquote there, and backticks also stop the author's own LaTeX
+  macros from being executed during the PDF build.
 
 ### 3.2 PDF
 
 ```bash
-python3 scripts/generate_report_pdf.py <report.md>
+python3 ~/.claude/skills/writing-simple-style/scripts/generate_report_pdf.py <report.md>
 ```
 
 Run this as the final step unless `--no-pdf` was given. If pandoc or LaTeX is missing, print
@@ -536,6 +553,6 @@ reference files; the ones that matter most:
   fact not in the source, say what is missing instead.
 - Never rewrite in a register the author does not use. Keep their terminology.
 - Never quote from the ISO standards. Cite the clause number; the guidance is paraphrased in
-  `references/iso-24495-plain-language.md` for this reason.
+  `~/.claude/skills/writing-simple-style/references/iso-24495-plain-language.md` for this reason.
 - Never edit the source document without being asked.
 - Never ask the user a question per paragraph.

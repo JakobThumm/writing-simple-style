@@ -119,12 +119,20 @@ templates/
   report_latex.tex                        pandoc LaTeX template
 ```
 
-`split_paragraphs.py` is usable on its own:
+`split_paragraphs.py` is usable on its own. Run it from a clone of this repository, or
+give the full path to the installed copy:
 
 ```bash
+# from a clone
 python3 scripts/split_paragraphs.py paper.tex --summary
 python3 scripts/split_paragraphs.py paper.tex --section Method --json paras.json
+
+# from anywhere, once installed
+python3 ~/.claude/skills/writing-simple-style/scripts/split_paragraphs.py paper.tex --summary
 ```
+
+For a multi-file LaTeX project, pass the root file and add `--follow-inputs`; anchors then
+point at the child file each paragraph actually lives in.
 
 It keeps display maths attached to the paragraph it belongs to, skips floats, tables,
 algorithms and code blocks, and reports line ranges so every finding can be anchored.
