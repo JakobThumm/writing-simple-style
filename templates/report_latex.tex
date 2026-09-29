@@ -1,0 +1,99 @@
+\documentclass[11pt, a4paper]{article}
+
+\usepackage{lmodern}   % scalable fonts: microtype expansion needs them
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{parskip}
+\usepackage{mdframed}
+% Protrusion only: expansion is unavailable under some minimal TeX installs.
+\usepackage[protrusion=true, expansion=false]{microtype}
+
+% Colors
+\definecolor{errorred}{HTML}{C0392B}
+\definecolor{warnamber}{HTML}{D68910}
+\definecolor{infoblue}{HTML}{2471A3}
+\definecolor{quotebg}{HTML}{F4F6F6}
+\definecolor{rewritebg}{HTML}{EAF3EA}
+\definecolor{headergray}{HTML}{2C3E50}
+\definecolor{rulegray}{HTML}{95A5A6}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=headergray,
+    urlcolor=infoblue,
+    pdfborder={0 0 0},
+}
+
+% Header / footer
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textcolor{headergray}{Writing Style Report}}
+\fancyhead[R]{\small\textcolor{headergray}{\today}}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Section styling
+\titleformat{\section}{\large\bfseries\color{headergray}}{}{0em}{}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries\color{headergray}}{}{0em}{}
+\titleformat{\subsubsection}{\small\bfseries\color{headergray}}{}{0em}{}
+
+% Blockquotes carry the offending text: give them a tinted frame.
+\newmdenv[
+    backgroundcolor=quotebg,
+    linecolor=rulegray,
+    linewidth=0.5pt,
+    leftmargin=0pt,
+    rightmargin=0pt,
+    innerleftmargin=8pt,
+    innerrightmargin=8pt,
+    innertopmargin=5pt,
+    innerbottommargin=5pt,
+    skipabove=5pt,
+    skipbelow=5pt,
+]{snippetbox}
+\renewenvironment{quote}{\begin{snippetbox}\small\itshape}{\end{snippetbox}}
+
+% Severity labels
+\newcommand{\errortag}{\textcolor{errorred}{\textbf{[ERROR]}}}
+\newcommand{\warntag}{\textcolor{warnamber}{\textbf{[WARN]}}}
+\newcommand{\infotag}{\textcolor{infoblue}{\textbf{[INFO]}}}
+
+% Inline code: wrap long anchors rather than overflowing the margin.
+\usepackage{fvextra}
+\fvset{breaklines=true, breakanywhere=true}
+
+\setlist[itemize]{noitemsep, topsep=3pt, leftmargin=1.2em}
+\setlist[enumerate]{noitemsep, topsep=3pt, leftmargin=1.5em}
+
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+$if(title)$
+\title{\textbf{$title$}}
+$endif$
+\date{}
+
+\begin{document}
+
+$if(title)$
+\maketitle
+\thispagestyle{fancy}
+$endif$
+
+$if(toc)$
+\tableofcontents
+\newpage
+$endif$
+
+$body$
+
+\end{document}

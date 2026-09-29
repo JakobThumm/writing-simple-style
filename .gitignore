@@ -1,0 +1,21 @@
+# Copyrighted source standards must never be committed.
+docs/
+*.pdf
+!templates/*.pdf
+
+# Generated reports
+*-style-report.md
+*-style-report.pdf
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Editors / OS
+.DS_Store
+*.swp
+.idea/
+.vscode/
