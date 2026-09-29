@@ -53,6 +53,27 @@ purpose recorded here, so a reader can audit the review against its own assumpti
 
 ---
 
+## Terminology against published ISO standards (L9)
+
+<!-- Omit this whole section if the iso-obp MCP server was unavailable, and say so
+     under "Not assessed" instead. -->
+
+Checked {{n}} candidate terms against {{n_sources}} indexed corpora ({{n_entries}} entries)
+via the `iso-obp` server.
+
+| Term | Status | Standard / clause | Note |
+|------|--------|-------------------|------|
+| {{term}} | defined | ISO 8373:2021 §3.1 | usage matches |
+| {{term}} | not in index | — | no definition in the indexed corpora |
+
+**Read `not in index` correctly.** It means the term is absent from the corpora listed
+above, not that ISO defines it nowhere. Novel research terms land here as a matter of
+course, and that is not a defect.
+
+Findings that arise from this table appear under **Language** with the other L-checks.
+
+---
+
 ## A. Section and audience fit
 
 **Summary:** {{section_level_summary}}
@@ -144,6 +165,9 @@ not evaluated, and a clean report above does not imply they are in order:
 - Table design (§5.3.7)
 - Abbreviation introduction, math notation, citation consistency — use the
   `proofreading` skill for these
+<!-- Include the next line only when the server was unavailable: -->
+- Terminology against published ISO standards (check L9): the `iso-obp` MCP server was
+  not reachable, so no term was verified against published terminology.
 - **Usability testing with real readers (ISO 24495-1 §5.4.3).** ISO treats an author's
   own review as the §5.4.2 step only. The standard is explicit that the sole way to
   learn how readers react is to involve them. This report does not replace that.

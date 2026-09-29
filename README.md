@@ -11,7 +11,8 @@ It checks three things for every paragraph:
 - **Sentence structure** — fragments, dangling modifiers, ambiguous attribution,
   parallelism, word order, emphasis
 - **Language** — specificity, conciseness, misused words, noun strings, terminology
-  consistency, complete comparisons, quantified hedges
+  consistency, complete comparisons, quantified hedges, and terms checked against
+  published ISO terminology
 
 ## What makes it different
 
@@ -89,6 +90,32 @@ Then invoke it with `/writing-simple-style` or just ask for feedback on your wri
 
 The skill works best on **one section or chapter at a time**, and will tell you so with your
 document's actual paragraph count before you choose.
+
+## Optional: checking terms against published ISO terminology
+
+Check **L9** verifies the paper's technical terms against standardized terminology, using
+the [`iso-obp`](https://github.com/JakobThumm/iso-obp-mcp) MCP server. Where a standard
+defines a term, the report cites the standard and clause and flags usage that contradicts
+it — most valuable for safety and robotics vocabulary, where definitions carry weight.
+
+It catches three things: a term used in a sense the standard contradicts, a term used under
+a non-preferred designation when the standard has one (looking up "neural net" returns the
+preferred "neural network", ISO/IEC 22989:2022 §3.4.8), and a private coinage the text never
+introduces.
+
+The skill degrades cleanly: **without the server, L9 is skipped**, the report says so under
+"Not assessed", and every other check runs as normal.
+
+Two things the check is careful about, because getting them wrong produces confident
+nonsense:
+
+- A term being absent from the index means it is absent from *the corpora that were
+  indexed*, not that ISO defines it nowhere. Novel research terms land there as a matter of
+  course and are never flagged for it.
+- Only the server's `defined` status means a standard defines the term. A hand-transcribed
+  entry and a user's own glossary entry are reported as the weaker things they are.
+
+The skill never writes to the terminology database. It only reads.
 
 ## Requirements
 

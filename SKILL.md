@@ -1,7 +1,7 @@
 ---
 name: writing-simple-style
 description: Review the writing style of a paper, thesis or report section by section and paragraph by paragraph. Identifies the target audience and purpose of each section together with the user, then checks paragraph structure, sentence structure and language against The Elements of Style and the ISO 24495 plain language standards. Produces a markdown report and a formatted PDF. Use when the user asks for style feedback, a readability or plain-language review, or help making a section clearer.
-allowed-tools: Read Bash Edit Write AskUserQuestion Glob Grep
+allowed-tools: Read Bash Edit Write AskUserQuestion Glob Grep mcp__iso-obp__corpus_info mcp__iso-obp__lookup_term mcp__iso-obp__lookup_terms mcp__iso-obp__search_terms
 license: MIT
 metadata:
     skill-author: Jakob Thumm
@@ -187,9 +187,9 @@ regardless of the answer, the prompt was theatre. Specifically:
 
 | The user chose | Then |
 | --- | --- |
-| Specialists | Do not flag established technical terms as jargon (check L6 only enforces *consistency*). Do not flag missing definitions of standard terms. |
-| Wider field | Flag subfield terms used without a brief definition at first use. |
-| Practitioners | Flag undefined specialized terms as `[ERROR]`. Flag method paragraphs whose detail exceeds what the purpose needs (A5). |
+| Specialists | Do not flag established technical terms as jargon (L6 enforces *consistency* only, L9 only contradictions and synonym drift). Do not flag missing definitions of standard terms. |
+| Wider field | Flag subfield terms used without a brief definition at first use (L6, L9). |
+| Practitioners | Flag undefined specialized terms as `[ERROR]` (L6, L9). Flag method paragraphs whose detail exceeds what the purpose needs (A5). |
 | Purpose = convince | Weight S7 (emphasis at end) and L2 (specific language) up. |
 | Purpose = enable reproduction | Weight L6 (terminology consistency) and S3 (attribution) up. |
 | Purpose = report findings | Weight L7 (incomplete comparison) and L8 (unquantified hedge) up. |
@@ -438,13 +438,7 @@ authors to simplify established scientific terms. It enforces the other half ins
   specialized term with no brief in-context definition at first use.
 - `[INFO]` if a term is introduced with a definition and then never used again.
 
-<!--
-Planned: verify scientific terms against ISO definitions via the iso-obp-mcp server
-(https://github.com/metanorma/obp-access as the ingest path). When that server is
-available, L6 gains: look up each candidate technical term, and where an ISO definition
-exists, check that the paper's usage matches it and cite the standard and clause.
-Until then L6 checks internal consistency only, which needs no external source.
--->
+L6 needs no external source. L9 adds the check against published terminology.
 
 #### L7. Complete comparisons
 *ISO 24495-3 §5.3.3 f).* A comparison must name both sides.
@@ -463,6 +457,107 @@ and, where possible, quantified.
   claim — a single-setting experiment stated as a general result.
 - Do not flag a hedge that correctly marks genuine uncertainty. That is the standard's
   intent, not a fault.
+
+#### L9. Technical terms against published ISO terminology
+*ISO 24495-1 §5.3.2 a), c), g); ISO 24495-3 §5.3.3 b), d).*
+
+Where L6 checks that the section is internally consistent, L9 checks it against terminology
+that has already been standardized. A term with a published ISO definition is the precise
+one to use, and using it in a sense the standard does not support is a real defect —
+especially in safety and robotics writing, where the definition may carry legal weight.
+
+This check requires the **`iso-obp` MCP server**. Run it **once per section**, not per
+paragraph, so the whole section costs one batch call.
+
+**Step 1 — check availability and scope.**
+
+Call `corpus_info` first. It reports which corpora are indexed and how many entries each
+holds. Record the source count and total in the report. If the server is unavailable or
+returns an error, skip L9 entirely, note it under "Not assessed", and continue with the
+rest of the review. **A missing server is not a finding.**
+
+**Step 2 — collect candidate terms.**
+
+From the section, gather multi-word and single-word noun phrases that read as domain
+terminology: `collaborative robot`, `protective separation distance`, `machine learning
+model`, `safety-rated monitored stop`. Exclude ordinary prose nouns, author-invented method
+names, and symbols. Deduplicate and normalize to lower case. Twenty to sixty candidates for
+a typical section is normal.
+
+**Step 3 — one batch lookup.**
+
+Call `lookup_terms` with the full candidate list. Do not loop over `lookup_term`.
+
+**Step 4 — read the status field precisely.** This is where the check goes wrong if rushed.
+The server returns four statuses and they are not interchangeable:
+
+| Status | Meaning | What to do |
+| --- | --- | --- |
+| `defined` | A standard in the index defines this term. | Cite the standard and clause. Compare the paper's usage with the definition. |
+| `defined_by_your_transcription` | The user transcribed it by hand from a standard they hold. It cites a source, but the wording is not verified against the published text. | Treat as defined; add "transcription not verified against the published text" to the finding. |
+| `defined_by_you_only` | The user's own working definition, from their glossary. **No standard defines it.** | `[WARN]` if the section does not introduce it explicitly. It is a private convention, not established terminology. |
+| `not_defined` | Absent from the indexed corpora. | **Not a finding on its own.** See step 5. |
+
+**Never report `not_defined` as "ISO does not define this term".** The index covers the
+corpora that were ingested locally, not all of ISO. The correct phrasing is "no definition
+in the indexed corpora (n sources)".
+
+**Step 5 — use `match_type` to catch non-preferred designations.**
+
+Each definition carries a `match_type`. When it is `synonym`, the paper used an admitted
+synonym and the `term` field holds the standard's **preferred** designation. This is the
+cheapest, most reliable synonym-drift signal in the check, and it comes back from the same
+batch call — no extra lookup.
+
+Example: looking up `neural net` returns `match_type: "synonym"`, `term: "neural network"`,
+`standard: "ISO/IEC 22989:2022"`, `clause: "3.4.8"`, with `synonyms: ["NN", "neural net",
+"artificial neural network"]`.
+
+- `[WARN]` when `match_type` is `synonym`: the concept is standardized under a different
+  preferred designation. Propose the preferred term, cite standard and clause, and note the
+  admitted synonyms so the author can judge.
+- Other useful fields on a match: `verbatim_from_source` (false means the wording was not
+  taken directly from the published text), `notes` (the standard's own notes, often the
+  clearest explanation of scope), and `entry_number`.
+
+**Step 5b — only then, for `not_defined`, try the concept.**
+
+Call `search_terms` with the term as keywords, for the terms that came back `not_defined`.
+This catches a concept standardized under a wording too different for the synonym index.
+
+- `[WARN]` only if the result is genuinely the same concept under a standardized
+  designation. Cite standard and clause.
+- If the results are merely adjacent, record the term as unverified and move on. Do **not**
+  flag it. Looking up `collaborative robot`, for instance, returns `not_defined` and the
+  search yields `collaborative operation`, `collaborative workspace` and `collaborative
+  task` — related vocabulary, none of them the same concept. That is a no-finding.
+- A term absent from the index is the normal case for novel research.
+
+**Step 6 — findings.**
+
+- `[ERROR]` if the paper uses a term with a published ISO definition in a sense that
+  contradicts that definition. Quote both. This is the highest-value finding the check
+  produces — a redefined safety term is a substantive error, not a style note.
+- `[WARN]` if the paper defines in its own words a term that a standard already defines, and
+  the two differ in scope. Propose adopting the standard definition, or state explicitly in
+  the text that the paper departs from it and why.
+- `[WARN]` for a non-preferred designation where a standardized one exists (step 5 / 5b).
+- `[WARN]` for a `defined_by_you_only` term that the section never introduces.
+- `[INFO]` for each term confirmed `defined`, listed compactly in one table rather than one
+  finding each. Confirmation is useful to the author, but not as forty separate bullets.
+
+**Audience gating**, consistent with phase 1:
+
+- **Specialists** — an ISO-defined term needs no gloss in the text. Only contradictions and
+  synonym drift are findings.
+- **Wider field** — `[WARN]` if an ISO-defined term is used with no brief in-context
+  definition at first use (ISO 24495-3 §5.3.3 b).
+- **Practitioners** — as above, at `[ERROR]`.
+
+**Never call `define_term` or `remove_term`.** Those write to the user's glossary file on
+disk, and that file is part of what later answers whether a term is defined. Writing a
+definition you inferred would corrupt the source of truth. If the user asks you to record a
+term, that is a separate, explicit request.
 
 ---
 
