@@ -187,9 +187,9 @@ regardless of the answer, the prompt was theatre. Specifically:
 
 | The user chose | Then |
 | --- | --- |
-| Specialists | Do not flag established technical terms as jargon (L6 enforces *consistency* only, L9 only contradictions and synonym drift). Do not flag missing definitions of standard terms. |
-| Wider field | Flag subfield terms used without a brief definition at first use (L6, L9). |
-| Practitioners | Flag undefined specialized terms as `[ERROR]` (L6, L9). Flag method paragraphs whose detail exceeds what the purpose needs (A5). |
+| Specialists | Do not flag established technical terms as jargon (L6a enforces *consistency* only, L6b only contradictions and synonym drift). Do not flag missing definitions of standard terms. |
+| Wider field | Flag subfield terms used without a brief definition at first use (L6a, L6b). |
+| Practitioners | Flag undefined specialized terms as `[ERROR]` (L6a, L6b). Flag method paragraphs whose detail exceeds what the purpose needs (A5). |
 | Purpose = convince | Weight S7 (emphasis at end) and L2 (specific language) up. |
 | Purpose = enable reproduction | Weight L6 (terminology consistency) and S3 (attribution) up. |
 | Purpose = report findings | Weight L7 (incomplete comparison) and L8 (unquantified hedge) up. |
@@ -428,7 +428,12 @@ carries the severity for each entry and lists the entries this skill deliberatel
 *ISO 24495-1 §5.3.2 g); ISO 24495-3 §5.3.3 a), b).*
 **Note the deliberate inversion.** ISO 24495-3 §5.3.3 c) suggests everyday alternatives to
 technical terms. For a research paper that costs precision, so this skill does **not** ask
-authors to simplify established scientific terms. It enforces the other half instead:
+authors to simplify established scientific terms. It enforces the other half instead.
+
+L6 has two halves. **L6a** checks the section against itself and needs no external source.
+**L6b** checks it against published terminology and needs the `iso-obp` MCP server.
+
+##### L6a. Internal consistency
 
 - `[ERROR]` for synonym drift — two or more terms used for one concept ("safety shield",
   "safety layer", "protective module"). Pick one and use it throughout. List every variant
@@ -438,43 +443,42 @@ authors to simplify established scientific terms. It enforces the other half ins
   specialized term with no brief in-context definition at first use.
 - `[INFO]` if a term is introduced with a definition and then never used again.
 
-L6 needs no external source. L9 adds the check against published terminology.
+##### L6b. Against published ISO terminology
 
-#### L7. Complete comparisons
-*ISO 24495-3 §5.3.3 f).* A comparison must name both sides.
-- `[ERROR]` for a comparative with no stated reference: "our method achieves lower error"
-  — lower than what?
-- `[WARN]` for "improves", "outperforms", "reduces" where the baseline is implied by
-  context but not named in the sentence.
+Where L6a checks that the section is internally consistent, L6b checks it against
+terminology that has already been standardized. A term with a published ISO definition is
+the precise one to use, and using it in a sense the standard does not support is a real
+defect — especially in safety and robotics writing, where the definition may carry legal
+weight.
 
-#### L8. Hedges tied to evidence
-*ISO 24495-3 §5.3.3 g).* Hedging is legitimate and expected; ISO asks that it be deliberate
-and, where possible, quantified.
-- `[WARN]` for a hedge on a claim the data could quantify: "performance is typically good"
-  → "accuracy is 94 % on average across the five tasks".
-- `[WARN]` for stacked hedges: "may potentially be able to somewhat improve".
-- `[INFO]` if a hedge is absent where the evidence does not support the strength of the
-  claim — a single-setting experiment stated as a general result.
-- Do not flag a hedge that correctly marks genuine uncertainty. That is the standard's
-  intent, not a fault.
-
-#### L9. Technical terms against published ISO terminology
-*ISO 24495-1 §5.3.2 a), c), g); ISO 24495-3 §5.3.3 b), d).*
-
-Where L6 checks that the section is internally consistent, L9 checks it against terminology
-that has already been standardized. A term with a published ISO definition is the precise
-one to use, and using it in a sense the standard does not support is a real defect —
-especially in safety and robotics writing, where the definition may carry legal weight.
-
-This check requires the **`iso-obp` MCP server**. Run it **once per section**, not per
+This half requires the **`iso-obp` MCP server**. Run it **once per section**, not per
 paragraph, so the whole section costs one batch call.
+
+**Citing, not reproducing.** The server returns definition text drawn from licensed
+standards. In the report, cite **standard and clause** and describe the mismatch in your own
+words. Quote the definition only in the one case where the exact wording is the finding —
+typically a contradiction — and then only the clause that carries it. This mirrors the rule
+that `references/iso-24495-plain-language.md` contains no text from the standards.
 
 **Step 1 — check availability and scope.**
 
 Call `corpus_info` first. It reports which corpora are indexed and how many entries each
 holds. Record the source count and total in the report. If the server is unavailable or
-returns an error, skip L9 entirely, note it under "Not assessed", and continue with the
+returns an error, skip L6b entirely, note it under "Not assessed", and continue with the
 rest of the review. **A missing server is not a finding.**
+
+Coverage is strong on robotics (ISO 8373), AI terminology (ISO/IEC 22989, ISO/PAS 8800),
+machinery and functional safety (ISO 12100, ISO 13849-1, ISO 13850, ISO 13855, ISO 13857),
+collaborative robots (ISO/TS 15066) and industrial trucks (ISO 3691-1…6), plus IEC
+Electropedia and the ISO/TC 211 and ISO 14812 registers. Do not claim more than
+`corpus_info` reports.
+
+**Known gap: ISO 10218-1 is not indexed** — the available copies are ISO/DIS drafts the
+extractor cannot parse. A term properly defined in 10218-1 can still come back
+`not_defined`. Never let a miss on a robot-safety term imply the term is unstandardized.
+
+ISO 24495-1 and ISO/FDIS 24495-3 are themselves indexed, so the skill's own normative basis
+can be cited with clause numbers.
 
 **Step 2 — collect candidate terms.**
 
@@ -496,13 +500,13 @@ The server returns four statuses and they are not interchangeable:
 | `defined` | A standard in the index defines this term. | Cite the standard and clause. Compare the paper's usage with the definition. |
 | `defined_by_your_transcription` | The user transcribed it by hand from a standard they hold. It cites a source, but the wording is not verified against the published text. | Treat as defined; add "transcription not verified against the published text" to the finding. |
 | `defined_by_you_only` | The user's own working definition, from their glossary. **No standard defines it.** | `[WARN]` if the section does not introduce it explicitly. It is a private convention, not established terminology. |
-| `not_defined` | Absent from the indexed corpora. | **Not a finding on its own.** See step 5. |
+| `not_defined` | Absent from the indexed corpora. | **Not a finding on its own.** See step 5c. |
 
 **Never report `not_defined` as "ISO does not define this term".** The index covers the
 corpora that were ingested locally, not all of ISO. The correct phrasing is "no definition
 in the indexed corpora (n sources)".
 
-**Step 5 — use `match_type` to catch non-preferred designations.**
+**Step 5a — use `match_type` to catch non-preferred designations.**
 
 Each definition carries a `match_type`. When it is `synonym`, the paper used an admitted
 synonym and the `term` field holds the standard's **preferred** designation. This is the
@@ -520,7 +524,30 @@ Example: looking up `neural net` returns `match_type: "synonym"`, `term: "neural
   taken directly from the published text), `notes` (the standard's own notes, often the
   clearest explanation of scope), and `entry_number`.
 
-**Step 5b — only then, for `not_defined`, try the concept.**
+**Step 5b — when a term returns several matches, compare them.**
+
+The server deliberately returns **every** match, because standards disagree and the
+disagreement is itself the finding. Do not take the first match and move on.
+
+First deduplicate: the same standard and clause can appear twice as an index artifact, and
+counting those as disagreement inflates the report.
+
+Then compare the remaining definitions:
+
+- **Substantively identical across standards** — no finding. `hazard` is "potential source
+  of harm" in ISO 12100 §3.6, ISO 13849-1 §3.1.17, ISO 10218-2 §3.1.6.1 and ISO/IEC Guide
+  51 §3.5. Consistent usage there needs no comment.
+- **One match from a different domain** — `[INFO]` only if the paper's usage is ambiguous
+  between them. `safety function` returns four machinery standards that agree (ISO 12100
+  §3.30, ISO 13849-1 §3.1.27, ISO 13850 §3.5, ISO 10218-2 §3.1.8.3) plus IAEA 395-07-88,
+  which is a nuclear-safety concept entirely. The machinery reading is obviously the
+  intended one; say nothing unless the text genuinely straddles the two.
+- **Genuine disagreement between standards in the paper's own domain** — `[WARN]`. Name
+  both clauses and ask the author to state which definition they are using. A `[SOURCE: …,
+  modified]` marker in a definition is a strong signal of this: ISO/PAS 8800 §3.3.5 defines
+  `hazard` from ISO 26262 with modification, which is not the ISO 12100 sense.
+
+**Step 5c — for `not_defined`, try the concept.**
 
 Call `search_terms` with the term as keywords, for the terms that came back `not_defined`.
 This catches a concept standardized under a wording too different for the synonym index.
@@ -535,13 +562,18 @@ This catches a concept standardized under a wording too different for the synony
 
 **Step 6 — findings.**
 
-- `[ERROR]` if the paper uses a term with a published ISO definition in a sense that
-  contradicts that definition. Quote both. This is the highest-value finding the check
-  produces — a redefined safety term is a substantive error, not a style note.
-- `[WARN]` if the paper defines in its own words a term that a standard already defines, and
-  the two differ in scope. Propose adopting the standard definition, or state explicitly in
-  the text that the paper departs from it and why.
-- `[WARN]` for a non-preferred designation where a standardized one exists (step 5 / 5b).
+- `[WARN]` if the paper uses a term in a sense that conflicts with the standard definition.
+  Cite standard and clause. This is the highest-value finding the check produces — a
+  safety term used loosely is a substantive problem, not a style nitpick. Worked example: a
+  draft using "safety function" for an ordinary software feature earns a `[WARN]` citing
+  ISO 13849-1 §3.1.27, because the standard's sense is a function whose *failure*
+  immediately increases risk.
+- `[INFO]` if the paper defines a term in-text that a standard already defines. Cite the
+  standard rather than reinventing the definition. Raise to `[WARN]` only where the paper's
+  wording and the standard's differ in scope, since that is a real divergence the reader
+  needs told about.
+- `[WARN]` for a non-preferred designation where a standardized one exists (step 5a / 5c).
+- `[WARN]` for genuine disagreement between standards in the paper's domain (step 5b).
 - `[WARN]` for a `defined_by_you_only` term that the section never introduces.
 - `[INFO]` for each term confirmed `defined`, listed compactly in one table rather than one
   finding each. Confirmation is useful to the author, but not as forty separate bullets.
@@ -558,6 +590,26 @@ This catches a concept standardized under a wording too different for the synony
 disk, and that file is part of what later answers whether a term is defined. Writing a
 definition you inferred would corrupt the source of truth. If the user asks you to record a
 term, that is a separate, explicit request.
+
+
+#### L7. Complete comparisons
+*ISO 24495-3 §5.3.3 f).* A comparison must name both sides.
+- `[ERROR]` for a comparative with no stated reference: "our method achieves lower error"
+  — lower than what?
+- `[WARN]` for "improves", "outperforms", "reduces" where the baseline is implied by
+  context but not named in the sentence.
+
+#### L8. Hedges tied to evidence
+*ISO 24495-3 §5.3.3 g).* Hedging is legitimate and expected; ISO asks that it be deliberate
+and, where possible, quantified.
+- `[WARN]` for a hedge on a claim the data could quantify: "performance is typically good"
+  → "accuracy is 94 % on average across the five tasks".
+- `[WARN]` for stacked hedges: "may potentially be able to somewhat improve".
+- `[INFO]` if a hedge is absent where the evidence does not support the strength of the
+  claim — a single-setting experiment stated as a general result.
+- Do not flag a hedge that correctly marks genuine uncertainty. That is the standard's
+  intent, not a fault.
+
 
 ---
 

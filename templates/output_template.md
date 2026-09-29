@@ -53,7 +53,7 @@ purpose recorded here, so a reader can audit the review against its own assumpti
 
 ---
 
-## Terminology against published ISO standards (L9)
+## Terminology against published ISO standards (L6b)
 
 <!-- Omit this whole section if the iso-obp MCP server was unavailable, and say so
      under "Not assessed" instead. -->
@@ -64,11 +64,16 @@ via the `iso-obp` server.
 | Term | Status | Standard / clause | Note |
 |------|--------|-------------------|------|
 | {{term}} | defined | ISO 8373:2021 §3.1 | usage matches |
+| {{term}} | defined, 2 standards differ | ISO 12100 §3.6; ISO/PAS 8800 §3.3.5 | state which sense is meant |
 | {{term}} | not in index | — | no definition in the indexed corpora |
 
 **Read `not in index` correctly.** It means the term is absent from the corpora listed
 above, not that ISO defines it nowhere. Novel research terms land here as a matter of
 course, and that is not a defect.
+
+**Known coverage gap:** ISO 10218-1 is not indexed, because the available copies are
+ISO/DIS drafts the extractor cannot parse. A robot-safety term defined there can appear
+as `not in index` above. Treat a miss on such a term as unverified, not unstandardized.
 
 Findings that arise from this table appear under **Language** with the other L-checks.
 
@@ -166,7 +171,7 @@ not evaluated, and a clean report above does not imply they are in order:
 - Abbreviation introduction, math notation, citation consistency — use the
   `proofreading` skill for these
 <!-- Include the next line only when the server was unavailable: -->
-- Terminology against published ISO standards (check L9): the `iso-obp` MCP server was
+- Terminology against published ISO standards (check L6b): the `iso-obp` MCP server was
   not reachable, so no term was verified against published terminology.
 - **Usability testing with real readers (ISO 24495-1 §5.4.3).** ISO treats an author's
   own review as the §5.4.2 step only. The standard is explicit that the sole way to

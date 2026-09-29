@@ -93,17 +93,23 @@ document's actual paragraph count before you choose.
 
 ## Optional: checking terms against published ISO terminology
 
-Check **L9** verifies the paper's technical terms against standardized terminology, using
+Check **L6b** verifies the paper's technical terms against standardized terminology, using
 the [`iso-obp`](https://github.com/JakobThumm/iso-obp-mcp) MCP server. Where a standard
 defines a term, the report cites the standard and clause and flags usage that contradicts
 it — most valuable for safety and robotics vocabulary, where definitions carry weight.
 
-It catches three things: a term used in a sense the standard contradicts, a term used under
+It catches four things: a term used in a sense the standard contradicts, a term used under
 a non-preferred designation when the standard has one (looking up "neural net" returns the
-preferred "neural network", ISO/IEC 22989:2022 §3.4.8), and a private coinage the text never
-introduces.
+preferred "neural network", ISO/IEC 22989:2022 §3.4.8), a private coinage the text never
+introduces, and a term that competing standards define differently — the server returns
+every match precisely because that disagreement is itself worth reporting.
 
-The skill degrades cleanly: **without the server, L9 is skipped**, the report says so under
+Coverage is strongest on robotics, AI terminology, machinery and functional safety,
+collaborative robots and industrial trucks, plus IEC Electropedia and the ISO/TC 211 and
+ISO 14812 registers. One known gap: ISO 10218-1 is not indexed, so a term defined there
+can come back as a miss.
+
+The skill degrades cleanly: **without the server, L6b is skipped**, the report says so under
 "Not assessed", and every other check runs as normal.
 
 Two things the check is careful about, because getting them wrong produces confident

@@ -151,14 +151,14 @@ consistency and §5.3.3 b) definition in context:
 - Then use that same term everywhere for that concept. Synonym drift ("safety shield",
   "safety layer", "protective module" for one thing) is the failure mode to flag.
 
-**Which term is "the accepted" one is answerable, not a matter of taste.** Check L9 puts
+**Which term is "the accepted" one is answerable, not a matter of taste.** Check L6b puts
 candidate terms to the `iso-obp` MCP server, which indexes published terminology from
 ISO committee registers and from standards the user has ingested. Where a standard defines
 a term, the skill cites the standard and clause, and flags usage that contradicts the
 definition. That matters most for safety and robotics vocabulary, where a definition can
 carry legal weight.
 
-Two cautions the server's own instructions insist on, carried into L9:
+Two cautions the server's own instructions insist on, carried into L6b:
 
 - Its `not_defined` status means "absent from the corpora indexed here", never "ISO defines
   this nowhere". Novel research terminology lands there routinely and is not a defect.
@@ -226,7 +226,7 @@ The highest-yield clause in the standard for scientific prose. Its items, paraph
 | a) | Keep language, terminology, tone and expression consistent through the document. A deliberate shift is acceptable for emphasis, for example for urgent information. | L6 |
 | b) | Help readers learn important terms and abbreviations by defining them — in context, in a sidebar, or in a glossary. Brief in-context definitions help most. | A5, L6 |
 | c) | Consider alternatives to technical terms and jargon. **Inverted for academic writing — see the adaptation note above.** | (adapted) |
-| d) | Handle specialized terms and abbreviations per ISO 24495-1 §5.3.2 c) and d). | L6, L9 |
+| d) | Handle specialized terms and abbreviations per ISO 24495-1 §5.3.2 c) and d). | L6b |
 | e) | **Maintain parallel structure** in sentences, paragraphs and headings: align grammatical elements so that similar ideas take similar grammatical form. | S5 |
 | f) | **When writing comparisons, present both terms** — state explicitly what is being compared with what. The standard's example is a claim of "significantly lower risk" that never names the comparison group. | L7 |
 | g) | **Choose hedges deliberately and quantify them where possible.** Words such as *typically*, *somewhat*, *to some extent*, *roughly comparable*, *can potentially be* signal that an interpretation may change with new data. Where possible, tie the hedge to an observed number or amount. | L8 |
@@ -268,8 +268,8 @@ parts. The questions this skill answers automatically:
 | Have you identified the purpose? | Phase 1 (interactive) |
 | Have you structured the document for readers? | A1, A2, A3 |
 | Are you using headings to help readers predict what comes next? | A2 |
-| Have you chosen words familiar to readers? | L4, L6, L9 |
-| Have you used precise language? | L2, L5, L6, L7, L8, L9 |
+| Have you chosen words familiar to readers? | L4, L6 |
+| Have you used precise language? | L2, L5, L6, L7, L8 |
 | Have you indicated the status of information? | A4 |
 | Are your sentences clear and concise? | S1–S9 |
 | Are your paragraphs clear and concise? | P1–P5 |
