@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Render a writing-style report (markdown) to a formatted PDF via pandoc.
 
-The markdown uses ``[ERROR]`` / ``[WARN]`` / ``[INFO]`` severity tags; this
-script colours them before handing the document to pandoc.
+The markdown marks issues with guillemet tags -- ‹voice›, ‹cut›,
+‹struct›, ‹term›, ‹word› -- which this script turns into
+coloured labels before handing the document to pandoc.
 
 Usage:
     generate_report_pdf.py report.md
@@ -21,19 +22,25 @@ from pathlib import Path
 
 TEMPLATE = Path(__file__).resolve().parent.parent / "templates" / "report_latex.tex"
 
-SEVERITY_MACRO = {
-    "ERROR": r"\errortag{}",
-    "WARN": r"\warntag{}",
-    "INFO": r"\infotag{}",
+# The five issue categories. Guillemets are used as delimiters rather than
+# square brackets because a report is full of real citations -- [12], [ats] --
+# and a bracketed tag would be indistinguishable from one, both to a reader
+# and to this substitution.
+CATEGORY_MACRO = {
+    "struct": r"\structtag{}",
+    "voice": r"\voicetag{}",
+    "cut": r"\cuttag{}",
+    "term": r"\termtag{}",
+    "word": r"\wordtag{}",
 }
-SEVERITY_RE = re.compile(r"\[(ERROR|WARN|INFO)\]")
+CATEGORY_RE = re.compile("‹(" + "|".join(CATEGORY_MACRO) + ")›")
 
-# Severity tags travel through pandoc as inert sentinels and only become LaTeX
+# Category tags travel through pandoc as inert sentinels and only become LaTeX
 # macros afterwards. That lets us run pandoc with raw LaTeX disabled, so a
 # quoted snippet containing the author's own macros (\rstar, \ac{...}) is
 # rendered as text instead of being executed and breaking the build.
-SENTINEL = "ZZSEVZZ{}ZZ"
-SENTINEL_RE = re.compile(r"ZZSEVZZ(ERROR|WARN|INFO)ZZ")
+SENTINEL = "ZZTAGZZ{}ZZ"
+SENTINEL_RE = re.compile(r"ZZTAGZZ(struct|voice|cut|term|word)ZZ")
 
 # Raw LaTeX, dollar maths and raw attributes are all disabled deliberately.
 PANDOC_FROM = (
@@ -46,9 +53,8 @@ PANDOC_FROM = (
     "+pipe_tables"
 )
 
-# Fenced code blocks and inline code must keep their literal [WARN] text.
+# Fenced code blocks and inline code must keep their tag text literal.
 FENCE_RE = re.compile(r"^\s*(```|~~~)")
-QUOTE_RE = re.compile(r"^(\s*)>\s?(.*)$")
 
 
 def check_deps(engine: str) -> bool:
@@ -70,23 +76,16 @@ def extract_title(md: str) -> str:
     return m.group(1).strip() if m else "Writing Style Report"
 
 
-def as_code_span(text: str) -> str:
-    """Wrap text in a backtick fence long enough to contain it."""
-    runs = [len(m.group(0)) for m in re.finditer(r"`+", text)]
-    fence = "`" * ((max(runs) + 1) if runs else 1)
-    pad = " " if text.startswith("`") or text.endswith("`") else ""
-    return f"{fence}{pad}{text}{pad}{fence}"
-
-
 def preprocess(md: str) -> str:
     """Prepare the report markdown for a pandoc run with raw LaTeX disabled.
 
     Two transformations:
 
-    * severity tags become inert sentinels, restored as coloured macros in
+    * category tags become inert sentinels, restored as coloured macros in
       the generated LaTeX;
-    * blockquote lines, which hold verbatim snippets of the author's source,
-      become code spans so that LaTeX in them is shown rather than executed.
+    Blockquoted source text needs no special handling: pandoc runs with raw
+    LaTeX and dollar maths disabled, so the author's macros are escaped to
+    literal text rather than executed.
     """
     out: list[str] = []
     in_fence = False
@@ -106,16 +105,11 @@ def preprocess(md: str) -> str:
             dropped_title = True
             continue
 
-        q = QUOTE_RE.match(line)
-        if q and q.group(2).strip():
-            out.append(f"{q.group(1)}> {as_code_span(q.group(2).rstrip())}")
-            continue
-
-        # Protect existing inline code spans from the severity substitution.
+        # Protect existing inline code spans from the tag substitution.
         parts = re.split(r"(`+[^`]*`+)", line)
         for i, part in enumerate(parts):
             if not part.startswith("`"):
-                parts[i] = SEVERITY_RE.sub(
+                parts[i] = CATEGORY_RE.sub(
                     lambda m: SENTINEL.format(m.group(1)), part
                 )
         out.append("".join(parts))
@@ -140,9 +134,6 @@ def build_pdf(md_path: Path, out_path: Path, engine: str, toc: bool) -> None:
             "--from", PANDOC_FROM,
             "--to", "latex",
             "--standalone",
-            # The H1 was dropped above in favour of \maketitle, so promote the
-            # rest: "##" must land on \section, not \subsection.
-            "--shift-heading-level-by=-1",
             "--template", str(TEMPLATE),
             "--variable", f"title={title}",
             "--output", str(work / "report.tex"),
@@ -155,7 +146,7 @@ def build_pdf(md_path: Path, out_path: Path, engine: str, toc: bool) -> None:
             fail("pandoc failed", result.stderr, md_path)
 
         tex = (work / "report.tex").read_text(encoding="utf-8")
-        tex = SENTINEL_RE.sub(lambda m: SEVERITY_MACRO[m.group(1)], tex)
+        tex = SENTINEL_RE.sub(lambda m: CATEGORY_MACRO[m.group(1)], tex)
         (work / "report.tex").write_text(tex, encoding="utf-8")
 
         # Twice, so the table of contents and page numbers settle.

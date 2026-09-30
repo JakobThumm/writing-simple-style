@@ -80,8 +80,8 @@ Strunk permits the deliberate fragment, with a warning:
 > and that he will not be suspected of a mere blunder in syntax or in punctuation."
 
 **Academic adaptation.** Deliberate fragments are rare in scientific prose. Flag every
-fragment, but at `[WARN]` when it reads as intentional emphasis and `[ERROR]` when it
-reads as a dropped comma.
+fragment with `‹struct›`, and say which kind it is: a dropped comma, or emphasis that a
+reader will mistake for one.
 
 ### Rule 7 — A participial phrase at the beginning of a sentence must refer to the grammatical subject
 
@@ -310,52 +310,53 @@ Strunk's own framing of what this list is for:
 > proper course will probably be not to patch up the sentence by substituting one word
 > or set of words for another, but to recast it completely."
 
-Entries below are the subset that still applies to scientific writing. Severity is the
-skill's, not Strunk's.
+Entries below are the subset that still applies to scientific writing. The emphasis column
+is the skill's, not Strunk's: **flag** means report it, **note** means mention it only at
+full depth, **off** means never report it. Findings from this table carry the `‹word›` tag.
 
-| Entry | Rule | Severity |
+| Entry | Rule | Emphasis |
 | --- | --- | --- |
-| **as good or better than** | Rearrange: "as good as his, or better". | `[WARN]` |
-| **as to whether** | *Whether* alone suffices (Rule 13). | `[WARN]` |
-| **but** after *doubt* / *help* | "no doubt but that" → "no doubt that"; "could not help see but that" → "could not help seeing that". | `[WARN]` |
-| **can** | Means *am/is/are able*. Not a substitute for *may* (permission or possibility). | `[INFO]` |
-| **case** | "In many cases, the rooms were poorly ventilated" → "Many of the rooms were poorly ventilated." Usually deletable. | `[WARN]` |
-| **certainly** | An indiscriminate intensifier, like *very*. | `[WARN]` |
-| **claim** (vb.) | Means *lay claim to*. Not a substitute for *declare*, *maintain*, *argue*, *report*. | `[WARN]` |
-| **compare** | *compare to* = point out resemblance between different orders of thing; *compare with* = point out differences within the same order. Benchmarks are compared **with** baselines. | `[WARN]` |
-| **consider** | No *as* when it means "believe to be": "We consider this approach sound", not "consider it as sound". | `[INFO]` |
-| **data** | A plural, like *phenomena* and *strata*: "These data were tabulated." | `[INFO]` |
-| **dependable** | A needless substitute for *reliable*, *trustworthy*. | `[INFO]` |
-| **different than** | Use *different from*, *other than*, or *unlike*. | `[WARN]` |
-| **divided into** | Not to be misused for *composed of*. A dataset is composed of samples; it is divided into folds. | `[INFO]` |
-| **due to** | Correct as a predicate adjective tied to a noun ("losses due to fires"); incorrect as an adverbial ("It failed, due to noise" → "because of noise"). | `[WARN]` |
-| **effect** | Noun = *result*; verb = *to bring about*. Do not confuse with *affect*. Avoid the vague noun use ("a smoothing effect"). | `[WARN]` |
-| **fact** | Only for matters capable of direct verification, not matters of judgement. And see *the fact that* under Rule 13. | `[WARN]` |
-| **factor** | Hackneyed: "His superior training was the great factor in his winning" → "He won by being better trained." | `[WARN]` |
-| **feature** | Hackneyed, adds nothing. **Exception: in machine learning, *feature* is a defined technical term — do not flag that sense.** | `[INFO]` |
+| **as good or better than** | Rearrange: "as good as his, or better". | flag |
+| **as to whether** | *Whether* alone suffices (Rule 13). | flag |
+| **but** after *doubt* / *help* | "no doubt but that" → "no doubt that"; "could not help see but that" → "could not help seeing that". | flag |
+| **can** | Means *am/is/are able*. Not a substitute for *may* (permission or possibility). | note |
+| **case** | "In many cases, the rooms were poorly ventilated" → "Many of the rooms were poorly ventilated." Usually deletable. | flag |
+| **certainly** | An indiscriminate intensifier, like *very*. | flag |
+| **claim** (vb.) | Means *lay claim to*. Not a substitute for *declare*, *maintain*, *argue*, *report*. | flag |
+| **compare** | *compare to* = point out resemblance between different orders of thing; *compare with* = point out differences within the same order. Benchmarks are compared **with** baselines. | flag |
+| **consider** | No *as* when it means "believe to be": "We consider this approach sound", not "consider it as sound". | note |
+| **data** | A plural, like *phenomena* and *strata*: "These data were tabulated." | note |
+| **dependable** | A needless substitute for *reliable*, *trustworthy*. | note |
+| **different than** | Use *different from*, *other than*, or *unlike*. | flag |
+| **divided into** | Not to be misused for *composed of*. A dataset is composed of samples; it is divided into folds. | note |
+| **due to** | Correct as a predicate adjective tied to a noun ("losses due to fires"); incorrect as an adverbial ("It failed, due to noise" → "because of noise"). | flag |
+| **effect** | Noun = *result*; verb = *to bring about*. Do not confuse with *affect*. Avoid the vague noun use ("a smoothing effect"). | flag |
+| **fact** | Only for matters capable of direct verification, not matters of judgement. And see *the fact that* under Rule 13. | flag |
+| **factor** | Hackneyed: "His superior training was the great factor in his winning" → "He won by being better trained." | flag |
+| **feature** | Hackneyed, adds nothing. **Exception: in machine learning, *feature* is a defined technical term — do not flag that sense.** | note |
 | **however** | Strunk: in the sense *nevertheless*, not first in its sentence. **Suppressed by default in this skill** — see the note below. | off |
-| **interesting** | "Do not announce that what you are about to tell is interesting; make it so." | `[WARN]` |
-| **kind of** / **sort of** | Not a substitute for *rather* or *something like*. Literal sense only. | `[WARN]` |
-| **less** | *Less* for quantity, *fewer* for number: "fewer samples", not "less samples". | `[WARN]` |
-| **like** | Governs nouns and pronouns; before phrases and clauses use *as*. | `[WARN]` |
-| **most** | Not a substitute for *almost*. | `[WARN]` |
-| **oftentimes** | Archaic. Use *often*. | `[WARN]` |
-| **one of the most** | "Threadbare and forcible-feeble" as an opener. Also: the relative clause takes a plural verb — "one of the ablest men that **have** attacked this problem". | `[WARN]` |
-| **people** | A political term; not interchangeable with *the public*, and in a paper rarely the right word for *participants*, *users*, or *subjects*. | `[INFO]` |
-| **phase** | A stage of transition or development. Not a substitute for *aspect* or *topic*. | `[INFO]` |
-| **possess** | Not a substitute for *have* or *own*: "He possessed great courage" → "He had great courage". | `[WARN]` |
-| **should / would** | First-person conditional takes *should*, not *would*. Habitual past needs no *would*. | `[INFO]` |
-| **so** | Not as an intensifier ("so good", "so efficient"). | `[WARN]` |
-| **state** | Not a substitute for *say* or *remark*; restrict to *express fully or clearly*. **Exception: *state* as the technical noun (system state $x$) is not this entry.** | `[INFO]` |
-| **very** | "Use this word sparingly. Where emphasis is necessary, use words strong in themselves." | `[WARN]` |
-| **viewpoint** | Write *point of view*, and do not misuse it for *view* or *opinion*. | `[INFO]` |
-| **whom** | Often wrongly used for *who* before "he said": "his brother, who he said would send the money". | `[INFO]` |
-| **respective / respectively** | "may usually be omitted with advantage". Keep only where the pairing is genuinely needed. | `[INFO]` |
-| **while** | Avoid as a loose substitute for *and* or *but*; best replaced by a semicolon. Acceptable for *although* where no ambiguity arises. Strictly, *during the time that*. | `[WARN]` |
-| **literal / literally** | Not for emphasis of a metaphor. | `[WARN]` |
-| **character / nature** (as in "acts of a hostile character") | Redundant padding: "hostile acts". | `[WARN]` |
-| **system** | "Frequently used without need": "the dormitory system" → "dormitories". | `[INFO]` |
-| **worth while** | Vague approval; and never before a noun. | `[INFO]` |
+| **interesting** | "Do not announce that what you are about to tell is interesting; make it so." | flag |
+| **kind of** / **sort of** | Not a substitute for *rather* or *something like*. Literal sense only. | flag |
+| **less** | *Less* for quantity, *fewer* for number: "fewer samples", not "less samples". | flag |
+| **like** | Governs nouns and pronouns; before phrases and clauses use *as*. | flag |
+| **most** | Not a substitute for *almost*. | flag |
+| **oftentimes** | Archaic. Use *often*. | flag |
+| **one of the most** | "Threadbare and forcible-feeble" as an opener. Also: the relative clause takes a plural verb — "one of the ablest men that **have** attacked this problem". | flag |
+| **people** | A political term; not interchangeable with *the public*, and in a paper rarely the right word for *participants*, *users*, or *subjects*. | note |
+| **phase** | A stage of transition or development. Not a substitute for *aspect* or *topic*. | note |
+| **possess** | Not a substitute for *have* or *own*: "He possessed great courage" → "He had great courage". | flag |
+| **should / would** | First-person conditional takes *should*, not *would*. Habitual past needs no *would*. | note |
+| **so** | Not as an intensifier ("so good", "so efficient"). | flag |
+| **state** | Not a substitute for *say* or *remark*; restrict to *express fully or clearly*. **Exception: *state* as the technical noun (system state $x$) is not this entry.** | note |
+| **very** | "Use this word sparingly. Where emphasis is necessary, use words strong in themselves." | flag |
+| **viewpoint** | Write *point of view*, and do not misuse it for *view* or *opinion*. | note |
+| **whom** | Often wrongly used for *who* before "he said": "his brother, who he said would send the money". | note |
+| **respective / respectively** | "may usually be omitted with advantage". Keep only where the pairing is genuinely needed. | note |
+| **while** | Avoid as a loose substitute for *and* or *but*; best replaced by a semicolon. Acceptable for *although* where no ambiguity arises. Strictly, *during the time that*. | flag |
+| **literal / literally** | Not for emphasis of a metaphor. | flag |
+| **character / nature** (as in "acts of a hostile character") | Redundant padding: "hostile acts". | flag |
+| **system** | "Frequently used without need": "the dormitory system" → "dormitories". | note |
+| **worth while** | Vague approval; and never before a noun. | note |
 
 #### Strunk entries this skill deliberately drops
 

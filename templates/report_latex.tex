@@ -18,10 +18,15 @@
 % Protrusion only: expansion is unavailable under some minimal TeX installs.
 \usepackage[protrusion=true, expansion=false]{microtype}
 
+% Strikethrough marks words to delete. normalem keeps \emph as italic.
+\usepackage[normalem]{ulem}
+
 % Colors
-\definecolor{errorred}{HTML}{C0392B}
-\definecolor{warnamber}{HTML}{D68910}
-\definecolor{infoblue}{HTML}{2471A3}
+\definecolor{markstruct}{HTML}{6C3483}
+\definecolor{markvoice}{HTML}{1F618D}
+\definecolor{markcut}{HTML}{B03A2E}
+\definecolor{markterm}{HTML}{117864}
+\definecolor{markword}{HTML}{B9770E}
 \definecolor{quotebg}{HTML}{F4F6F6}
 \definecolor{rewritebg}{HTML}{EAF3EA}
 \definecolor{headergray}{HTML}{2C3E50}
@@ -63,10 +68,13 @@
 ]{snippetbox}
 \renewenvironment{quote}{\begin{snippetbox}\small\itshape}{\end{snippetbox}}
 
-% Severity labels
-\newcommand{\errortag}{\textcolor{errorred}{\textbf{[ERROR]}}}
-\newcommand{\warntag}{\textcolor{warnamber}{\textbf{[WARN]}}}
-\newcommand{\infotag}{\textcolor{infoblue}{\textbf{[INFO]}}}
+% Category tags. \allowbreak lets a tag wrap away from the span it follows.
+\newcommand{\marktag}[2]{\allowbreak{\footnotesize\textsf{\textcolor{#1}{#2}}}}
+\newcommand{\structtag}{\marktag{markstruct}{[struct]}}
+\newcommand{\voicetag}{\marktag{markvoice}{[voice]}}
+\newcommand{\cuttag}{\marktag{markcut}{[cut]}}
+\newcommand{\termtag}{\marktag{markterm}{[term]}}
+\newcommand{\wordtag}{\marktag{markword}{[word]}}
 
 % Inline code: wrap long anchors rather than overflowing the margin.
 \usepackage{fvextra}

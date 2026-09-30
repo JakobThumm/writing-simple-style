@@ -78,18 +78,64 @@ Then invoke it with `/writing-simple-style` or just ask for feedback on your wri
 ## Usage
 
 ```
-/writing-simple-style [path] [--section <name>] [--all] [--check <group>] [--no-pdf]
+/writing-simple-style [path] [--depth coarse|medium|full] [--section <name>] [--all]
+                      [--check <group>] [--no-pdf]
 ```
 
 - `path` — a `.tex` or `.md` file. For a multi-file LaTeX project, pass the root file.
+- `--depth` — how much to report; skips the depth prompt.
 - `--section <name>` — review only sections whose title contains this string.
 - `--all` — review the whole document.
 - `--check <group>` — one family only: `A` (section fit), `P` (paragraph), `S` (sentence),
-  `L` (language).
+  `L` (language). Narrows which families run; `--depth` still sets verbosity within them.
 - `--no-pdf` — markdown report only.
 
 The skill works best on **one section or chapter at a time**, and will tell you so with your
 document's actual paragraph count before you choose.
+
+### Depth
+
+You are asked up front how much you want. The report has the same shape in all three cases;
+only how much fills it changes.
+
+| Depth | What you get |
+| --- | --- |
+| **Coarse** | Fast. Only the seven priority rules, and only patterns that **recur three or more times**, with one or two illustrative instances each. Your reader and purpose are inferred from the text rather than asked about. |
+| **Medium** | The seven priority rules, **at most two comments per sentence**, chosen by rule priority. Reader and purpose are agreed with you first. |
+| **Full** | Every check, every issue, including terminology against published ISO standards. |
+
+The seven priority rules, in the order that breaks ties at medium depth: one topic per
+paragraph (Strunk 8), do not break sentences in two (6), active voice and clear attribution
+(10), avoid a succession of loose sentences (14), definite and concrete language (12), omit
+needless words (13), and choose familiar words used consistently (ISO 24495-1 §5.3.2).
+
+### What the report looks like
+
+```
+# Summary
+  reader and purpose, then up to five recurring issues with counts
+## Paragraph 3
+  the paragraph, copied verbatim
+### General paragraph comments
+  one topic or several; where the topic sentence sits; how it ends
+### Per-sentence comments
+  the sentence, with each problem span marked, then a bullet per mark
+```
+
+There is **no error / warning / info split**. Issues are distinguished by category, and
+each marked span carries a tag that is coloured in the PDF:
+
+| Tag | Category | Marking |
+| --- | --- | --- |
+| `‹struct›` | sentence structure — order, splitting, parallelism, emphasis | **bold** |
+| `‹voice›` | voice and attribution — who is doing what | **bold** |
+| `‹cut›` | needless words | ~~struck through~~ |
+| `‹term›` | ill-defined or inconsistent term | `monospace` |
+| `‹word›` | word used incorrectly | **bold** |
+
+Strikethrough for `‹cut›` shows the deletion instead of describing it. The tags use
+guillemets rather than square brackets so they can never be confused with a citation
+like `[12]`.
 
 ## Optional: checking terms against published ISO terminology
 
